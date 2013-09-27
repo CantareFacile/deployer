@@ -50,22 +50,12 @@ directory "#{node['deployer']['home']}/.ssh" do
   recursive true
 end
 
-# # SEL users and deployers that can deploy to this node
-# query = "deploy:any OR deploy:#{node['fqdn']} OR deploy:#{node['ipaddress']}"
-# users = [:users, :deployers].collect do |data_bag|
-#   # Because the data_bag may not exist, wrap in a safe search
-#   begin
-#     search(data_bag, query)
-#   rescue Net::HTTPServerException
-#     []
-#   end
-# end.flatten
+bash "copy_authorized_keys" do
+  code <<-EOH
+    cp /root/.ssh/authorized_keys #{node['deployer']['home']}/.ssh/authorized_keys
+    chown #{node['deployer']['user']}:#{node['deployer']['group']} #{node['deployer']['home']}/.ssh/authorized_keys
+    chmod 0644 #{node['deployer']['home']}/.ssh/authorized_keys
+  EOH
 
-# # TMPL /home/deploy/.ssh/authorized_keys
-# template "#{node['deployer']['home']}/.ssh/authorized_keys" do
-#   owner     node['deployer']['user']
-#   group     node['deployer']['group']
-#   mode      '0644'
-#   variables :users => users
-#   source    'authorized_keys.erb'
-# end
+  not_if "test -f #{node['deployer']['home']}/.ssh/authorized_keys"
+end
