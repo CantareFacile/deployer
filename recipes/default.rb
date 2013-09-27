@@ -51,11 +51,18 @@ directory "#{node['deployer']['home']}/.ssh" do
 end
 
 authorized_keys = File.read("/root/.ssh/authorized_keys")
+ssh_config = "Host github.com\n\tStrictHostKeyChecking no\n"
 
 file "#{node['deployer']['home']}/.ssh/authorized_keys" do
   owner     node['deployer']['user']
   group     node['deployer']['group']
   mode      '0644'
-  action :create_if_missing
   content authorized_keys
+end
+
+file "#{node['deployer']['home']}/.ssh/config" do
+  owner     node['deployer']['user']
+  group     node['deployer']['group']
+  mode      '0644'
+  content ssh_config
 end
