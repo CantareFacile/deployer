@@ -50,12 +50,12 @@ directory "#{node['deployer']['home']}/.ssh" do
   recursive true
 end
 
-bash "copy_authorized_keys" do
-  code <<-EOH
-    cp /root/.ssh/authorized_keys #{node['deployer']['home']}/.ssh/authorized_keys
-    chown #{node['deployer']['user']}:#{node['deployer']['group']} #{node['deployer']['home']}/.ssh/authorized_keys
-    chmod 0644 #{node['deployer']['home']}/.ssh/authorized_keys
-  EOH
+authorized_keys = File.read("/root/.ssh/authorized_keys")
 
-  not_if "test -f #{node['deployer']['home']}/.ssh/authorized_keys"
+file "#{node['deployer']['home']}/.ssh/authorized_keys" do
+  owner     node['deployer']['user']
+  group     node['deployer']['group']
+  mode      '0644'
+  action :create_if_missing
+  content authorized_keys
 end
