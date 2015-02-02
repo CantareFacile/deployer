@@ -1,3 +1,4 @@
+name 'deployer'
 maintainer 'Seth Vargo'
 maintainer_email 'sethvargo@gmail.com'
 license 'All rights reserved'
